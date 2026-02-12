@@ -1,0 +1,126 @@
+/* Orders Page Styles */
+
+.orders-page {
+    padding: var(--spacing-xl) 0;
+}
+
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.order-card {
+    padding: var(--spacing-lg);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.order-id {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.order-id strong {
+    color: var(--light-50);
+    font-size: 1.1rem;
+}
+
+.order-id span {
+    color: var(--dark-400);
+    font-size: 0.85rem;
+}
+
+.order-items {
+    margin-bottom: var(--spacing-md);
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.item-name {
+    flex: 1;
+    color: var(--dark-200);
+}
+
+.item-qty {
+    color: var(--dark-400);
+    font-size: 0.9rem;
+}
+
+.item-price {
+    font-weight: 600;
+    color: var(--light-50);
+}
+
+.more-items {
+    color: var(--dark-400);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.order-total {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.order-total span {
+    color: var(--dark-400);
+}
+
+.order-total strong {
+    font-size: 1.25rem;
+    color: var(--light-50);
+}
+
+.order-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .page-header-row {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .order-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .order-actions {
+        justify-content: flex-end;
+    }
+}

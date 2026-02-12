@@ -24,19 +24,23 @@ const adminLogin = asyncHandler(async (req, res) => {
     const admin = await Admin.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!admin) {
+        console.log(`Admin login failed: User ${email} not found`);
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     if (admin.isLocked) {
+        console.log(`Admin login failed: Account locked for ${email}`);
         return res.status(423).json({ success: false, message: 'Account is temporarily locked' });
     }
 
     if (!admin.isActive) {
+        console.log(`Admin login failed: Account deactivated for ${email}`);
         return res.status(401).json({ success: false, message: 'Account deactivated' });
     }
 
     const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
+        console.log(`Admin login failed: Password mismatch for ${email}`);
         await admin.incLoginAttempts();
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }

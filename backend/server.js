@@ -61,6 +61,11 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/suppliers', supplierRoutes);
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+// Serve static files
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // Error handling
 app.use(notFound);
