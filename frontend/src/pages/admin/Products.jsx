@@ -14,7 +14,8 @@ const AdminProducts = () => {
     const [search, setSearch] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)
-    const [formData, setFormData] = useState({ name: '', description: '', category: '', price: '', stock: '', sku: '' })
+    const [uploading, setUploading] = useState(false)
+    const [formData, setFormData] = useState({ name: '', description: '', category: '', price: '', stock: '', sku: '', image: '' })
 
     useEffect(() => { fetchProducts() }, [search])
 
@@ -29,19 +30,48 @@ const AdminProducts = () => {
         }
     }
 
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        const data = new FormData()
+        data.append('image', file)
+
+        setUploading(true)
+        try {
+            const { uploadAPI } = await import('../../services/api')
+            const response = await uploadAPI.uploadImage(data)
+
+            const imageUrl = `http://localhost:5000${response.data.imageUrl}`
+            setFormData(prev => ({ ...prev, image: imageUrl }))
+            toast.success('Image uploaded!')
+        } catch (error) {
+            console.error(error)
+            toast.error('Image upload failed')
+        } finally {
+            setUploading(false)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        const productData = {
+            ...formData,
+            images: formData.image ? [{ url: formData.image, alt: formData.name }] : []
+        }
+
         try {
             if (editingProduct) {
-                await productsAPI.update(editingProduct._id, formData)
+                await productsAPI.update(editingProduct._id, productData)
                 toast.success('Product updated!')
             } else {
-                await productsAPI.create(formData)
+                await productsAPI.create(productData)
                 toast.success('Product created!')
             }
             setShowModal(false)
             setEditingProduct(null)
-            setFormData({ name: '', description: '', category: '', price: '', stock: '', sku: '' })
+            setFormData({ name: '', description: '', category: '', price: '', stock: '', sku: '', image: '' })
             fetchProducts()
         } catch (error) {
             toast.error('Failed to save product')
@@ -50,7 +80,15 @@ const AdminProducts = () => {
 
     const handleEdit = (product) => {
         setEditingProduct(product)
-        setFormData({ name: product.name, description: product.description, category: product.category, price: product.price, stock: product.stock, sku: product.sku })
+        setFormData({
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            price: product.price,
+            stock: product.stock,
+            sku: product.sku,
+            image: product.images && product.images.length > 0 ? product.images[0].url : ''
+        })
         setShowModal(true)
     }
 
@@ -125,7 +163,22 @@ const AdminProducts = () => {
                                 <div className="form-row">
                                     <div className="form-group">
                                         <label className="form-label">Category</label>
-                                        <input type="text" className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} />
+                                        <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required>
+                                            <option value="">Select Category</option>
+                                            <option value="Rig Equipment">Rig Equipment</option>
+                                            <option value="Drilling Tools">Drilling Tools</option>
+                                            <option value="Safety Equipment">Safety Equipment</option>
+                                            <option value="Pipes & Fittings">Pipes & Fittings</option>
+                                            <option value="Valves">Valves</option>
+                                            <option value="Pumps">Pumps</option>
+                                            <option value="Motors">Motors</option>
+                                            <option value="Electrical Components">Electrical Components</option>
+                                            <option value="Hydraulic Parts">Hydraulic Parts</option>
+                                            <option value="Spare Parts">Spare Parts</option>
+                                            <option value="Consumables">Consumables</option>
+                                            <option value="Critical Machined Items">Critical Machined Items</option>
+                                            <option value="Other">Other</option>
+                                        </select>
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">SKU</label>
@@ -146,16 +199,53 @@ const AdminProducts = () => {
                                     <label className="form-label">Description</label>
                                     <textarea className="form-input" rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
                                 </div>
+                                <div className="form-group">
+                                    <label className="form-label">Product Image</label>
+
+                                    <div className="image-input-methods" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Enter Image URL or Upload below"
+                                            value={formData.image}
+                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                        />
+
+                                        <div className="divider" style={{ textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>- OR -</div>
+
+                                        <div className="image-upload-container">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                className="form-input"
+                                                id="product-image-upload"
+                                            />
+                                            {uploading && <span className="upload-status">Uploading...</span>}
+                                        </div>
+                                    </div>
+
+                                    {formData.image && (
+                                        <div className="image-preview">
+                                            <img src={formData.image} alt="Preview" style={{ height: '150px', marginTop: '10px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #333' }} />
+                                            <button type="button" className="btn-icon danger" onClick={() => setFormData({ ...formData, image: '' })} style={{ marginLeft: '10px' }}>
+                                                <FiTrash2 /> Remove
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary">{editingProduct ? 'Update' : 'Create'}</button>
+                                <button type="submit" className="btn btn-primary" disabled={uploading}>
+                                    {editingProduct ? 'Update' : 'Create'}
+                                </button>
                             </div>
                         </form>
                     </div>
-                </div>
+                </div >
             )}
-        </div>
+        </div >
     )
 }
 

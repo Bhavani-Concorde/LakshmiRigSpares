@@ -97,11 +97,11 @@ const AdminServices = () => {
     const handleEdit = (service) => {
         setEditing(service)
         setFormData({
-            name: service.name,
-            description: service.description,
-            category: service.category,
+            name: service.name || '',
+            description: service.description || '',
+            category: service.category || '',
             pricing: service.pricing || { type: 'fixed', basePrice: '' },
-            duration: service.duration,
+            duration: service.duration || '',
             image: service.images && service.images.length > 0 ? service.images[0].url : ''
         })
         setShowModal(true)
@@ -173,7 +173,21 @@ const AdminServices = () => {
                                 <div className="form-row">
                                     <div className="form-group">
                                         <label className="form-label">Category</label>
-                                        <input type="text" className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} />
+                                        <select className="form-input" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required>
+                                            <option value="">Select Category</option>
+                                            <option value="Drilling">Drilling</option>
+                                            <option value="Installation">Installation</option>
+                                            <option value="Maintenance">Maintenance</option>
+                                            <option value="Repair">Repair</option>
+                                            <option value="Inspection">Inspection</option>
+                                            <option value="Consultation">Consultation</option>
+                                            <option value="Training">Training</option>
+                                            <option value="Emergency Service">Emergency Service</option>
+                                            <option value="Annual Maintenance Contract">Annual Maintenance Contract</option>
+                                            <option value="Calibration">Calibration</option>
+                                            <option value="Testing">Testing</option>
+                                            <option value="Other">Other</option>
+                                        </select>
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Duration</label>
@@ -182,4 +196,70 @@ const AdminServices = () => {
                                 </div>
                                 <div className="form-row">
                                     <div className="form-group">
-                                        <label
+                                        <label className="form-label">Pricing Type</label>
+                                        <select className="form-input" value={formData.pricing.type} onChange={e => setFormData({ ...formData, pricing: { ...formData.pricing, type: e.target.value } })}>
+                                            <option value="fixed">Fixed</option>
+                                            <option value="hourly">Hourly</option>
+                                            <option value="quote">Quote Based</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Base Price (₹)</label>
+                                        <input type="number" className="form-input" value={formData.pricing.basePrice} onChange={e => setFormData({ ...formData, pricing: { ...formData.pricing, basePrice: e.target.value } })} />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Description</label>
+                                    <textarea className="form-input" rows="4" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Service Image</label>
+
+                                <div className="image-input-methods" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder="Enter Image URL or Upload below"
+                                        value={formData.image}
+                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                    />
+
+                                    <div className="divider" style={{ textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>- OR -</div>
+
+                                    <div className="image-upload-container">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="form-input"
+                                            id="service-image-upload"
+                                        />
+                                        {uploading && <span className="upload-status">Uploading...</span>}
+                                    </div>
+                                </div>
+
+                                {formData.image && (
+                                    <div className="image-preview">
+                                        <img src={formData.image} alt="Preview" style={{ height: '150px', marginTop: '10px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #333' }} />
+                                        <button type="button" className="btn-icon danger" onClick={() => setFormData({ ...formData, image: '' })} style={{ marginLeft: '10px' }}>
+                                            <FiTrash2 /> Remove
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" disabled={uploading}>
+                                    {editing ? 'Update' : 'Create'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
+export default AdminServices

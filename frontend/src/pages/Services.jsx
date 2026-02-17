@@ -92,7 +92,11 @@ const Services = () => {
                                     <div className="service-meta">
                                         {service.duration && <span className="meta-item"><FiClock /> {service.duration}</span>}
                                         {service.serviceArea && <span className="meta-item"><FiMapPin /> {service.serviceArea}</span>}
-                                        {service.rating && <span className="meta-item"><FiStar /> {service.rating}</span>}
+                                        {service.rating && typeof service.rating === 'object' ? (
+                                            <span className="meta-item"><FiStar /> {service.rating.average || 0} ({service.rating.count || 0})</span>
+                                        ) : (
+                                            <span className="meta-item"><FiStar /> {service.rating || 0}</span>
+                                        )}
                                     </div>
                                     <div className="service-pricing">
                                         {service.pricing?.type === 'fixed' ? (

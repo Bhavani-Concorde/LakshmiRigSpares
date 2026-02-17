@@ -40,6 +40,7 @@ const serviceSchema = new mongoose.Schema({
             'Annual Maintenance Contract',
             'Calibration',
             'Testing',
+            'Drilling',
             'Other'
         ]
     },

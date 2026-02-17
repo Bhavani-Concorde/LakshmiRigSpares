@@ -86,7 +86,11 @@ const ServiceDetail = () => {
                             <div className="service-quick-info">
                                 {service.duration && <div className="info-item"><FiClock /> Duration: {service.duration}</div>}
                                 {service.serviceArea && <div className="info-item"><FiMapPin /> Area: {service.serviceArea}</div>}
-                                {service.rating && <div className="info-item"><FiStar /> Rating: {service.rating}/5</div>}
+                                {service.rating && typeof service.rating === 'object' ? (
+                                    <div className="info-item"><FiStar /> Rating: {service.rating.average || 0}/5</div>
+                                ) : (
+                                    <div className="info-item"><FiStar /> Rating: {service.rating || 0}/5</div>
+                                )}
                             </div>
 
                             <button className="btn btn-primary btn-lg btn-block" onClick={handleBookNow}>

@@ -41,6 +41,7 @@ const productSchema = new mongoose.Schema({
             'Hydraulic Parts',
             'Spare Parts',
             'Consumables',
+            'Critical Machined Items',
             'Other'
         ]
     },
