@@ -5,10 +5,13 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { bookingsAPI } from '../../services/api'
-import { FiCalendar, FiClock, FiMapPin, FiX } from 'react-icons/fi'
+import { useAuth } from '../../context/AuthContext'
+import { processPayment } from '../../services/razorpay'
+import { FiCalendar, FiClock, FiMapPin, FiX, FiCreditCard } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 
 const UserBookings = () => {
+    const { user } = useAuth()
     const [bookings, setBookings] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -34,6 +37,17 @@ const UserBookings = () => {
         } catch (error) {
             toast.error('Failed to cancel')
         }
+    }
+
+    const handlePayment = async (booking) => {
+        await processPayment({
+            amount: booking.finalPrice || booking.estimatedPrice,
+            bookingId: booking._id,
+            user: user,
+            onSuccess: () => {
+                fetchBookings()
+            }
+        })
     }
 
     const getStatusBadge = (status) => {
@@ -74,9 +88,14 @@ const UserBookings = () => {
                                         <span>Price:</span>
                                         <strong>₹{(booking.finalPrice || booking.estimatedPrice)?.toLocaleString()}</strong>
                                     </div>
-                                    {booking.status === 'pending' && (
-                                        <button className="btn btn-danger btn-sm" onClick={() => handleCancel(booking._id)}><FiX /> Cancel</button>
-                                    )}
+                                    <div className="order-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+                                        {booking.status === 'pending' && booking.paymentStatus !== 'paid' && (booking.finalPrice || booking.estimatedPrice) > 0 && (
+                                            <button className="btn btn-primary btn-sm" onClick={() => handlePayment(booking)}><FiCreditCard /> Pay Now</button>
+                                        )}
+                                        {booking.status === 'pending' && (
+                                            <button className="btn btn-danger btn-sm" onClick={() => handleCancel(booking._id)}><FiX /> Cancel</button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}

@@ -8,7 +8,6 @@ const { protect } = require('../middleware/authMiddleware');
 const {
     registerUser,
     loginUser,
-    googleAuth,
     getProfile,
     updateProfile,
     updatePassword,
@@ -21,7 +20,6 @@ const {
 // Public routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.post('/google', googleAuth);
 router.post('/refresh-token', refreshAccessToken);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);

@@ -106,7 +106,7 @@ enquirySchema.index({ user: 1, status: 1 });
 enquirySchema.index({ product: 1 });
 enquirySchema.index({ service: 1 });
 enquirySchema.index({ status: 1 });
-enquirySchema.index({ enquiryId: 1 });
+// enquirySchema.index({ enquiryId: 1 }); // Removed to avoid duplicate index warning
 enquirySchema.index({ type: 1 });
 
 // Generate enquiry ID before saving

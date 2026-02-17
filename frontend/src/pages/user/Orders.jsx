@@ -3,16 +3,31 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ordersAPI } from '../../services/api'
-import { FiPackage, FiEye, FiX } from 'react-icons/fi'
+import { useAuth } from '../../context/AuthContext'
+import { processPayment } from '../../services/razorpay'
+import { FiPackage, FiEye, FiX, FiCreditCard } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import './Orders.css'
 
 const UserOrders = () => {
+    const { user } = useAuth()
+    const location = useLocation()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState('all')
+
+    useEffect(() => {
+        if (location.state?.orderSuccess) {
+            toast.success(`Order ${location.state.orderId} placed successfully!`, {
+                icon: '🎉',
+                duration: 5000
+            })
+            // Clear state to prevent toast on re-renders
+            window.history.replaceState({}, document.title)
+        }
+    }, [location])
 
     useEffect(() => { fetchOrders() }, [filter])
 
@@ -38,6 +53,17 @@ const UserOrders = () => {
         } catch (error) {
             toast.error('Failed to cancel order')
         }
+    }
+
+    const handlePayment = async (order) => {
+        await processPayment({
+            amount: order.total,
+            orderId: order._id,
+            user: user,
+            onSuccess: () => {
+                fetchOrders()
+            }
+        })
     }
 
     const getStatusBadge = (status) => {
@@ -99,6 +125,9 @@ const UserOrders = () => {
                                     </div>
                                     <div className="order-actions">
                                         <Link to={`/my-orders/${order._id}`} className="btn btn-ghost btn-sm"><FiEye /> View</Link>
+                                        {order.status === 'pending' && order.paymentStatus !== 'paid' && (
+                                            <button className="btn btn-primary btn-sm" onClick={() => handlePayment(order)}><FiCreditCard /> Pay Now</button>
+                                        )}
                                         {order.status === 'pending' && (
                                             <button className="btn btn-danger btn-sm" onClick={() => handleCancel(order._id)}><FiX /> Cancel</button>
                                         )}

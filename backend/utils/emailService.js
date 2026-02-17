@@ -7,13 +7,23 @@ const nodemailer = require('nodemailer');
 
 // Create reusable transporter
 const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    },
+    tls: {
+      rejectUnauthorized: false
+    },
+    pool: false,
+    // Decrease timeout to fail faster if blocked
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+  });
 };
 
 /**
@@ -22,31 +32,31 @@ const createTransporter = () => {
  * @returns {Promise}
  */
 const sendEmail = async (options) => {
-    try {
-        const transporter = createTransporter();
+  try {
+    const transporter = createTransporter();
 
-        const mailOptions = {
-            from: `"Sri Lakshmi Rig Spares" <${process.env.EMAIL_USER}>`,
-            to: options.to,
-            subject: options.subject,
-            html: options.html,
-            text: options.text
-        };
+    const mailOptions = {
+      from: `"Sri Lakshmi Rig Spares" <${process.env.EMAIL_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text
+    };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.messageId);
-        return info;
-    } catch (error) {
-        console.error('Email sending failed:', error);
-        throw error;
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    throw error;
+  }
 };
 
 /**
  * Send Welcome Email to new user
  */
 const sendWelcomeEmail = async (user) => {
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -85,27 +95,27 @@ const sendWelcomeEmail = async (user) => {
     </html>
   `;
 
-    return sendEmail({
-        to: user.email,
-        subject: 'Welcome to Sri Lakshmi Rig Spares!',
-        html,
-        text: `Welcome ${user.name}! Thank you for registering with Sri Lakshmi Rig Spares.`
-    });
+  return sendEmail({
+    to: user.email,
+    subject: 'Welcome to Sri Lakshmi Rig Spares!',
+    html,
+    text: `Welcome ${user.name}! Thank you for registering with Sri Lakshmi Rig Spares.`
+  });
 };
 
 /**
  * Send Order Confirmation Email
  */
 const sendOrderConfirmation = async (user, order) => {
-    const itemsList = order.items.map(item =>
-        `<tr>
+  const itemsList = order.items.map(item =>
+    `<tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₹${item.total.toLocaleString()}</td>
     </tr>`
-    ).join('');
+  ).join('');
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -152,19 +162,19 @@ const sendOrderConfirmation = async (user, order) => {
     </html>
   `;
 
-    return sendEmail({
-        to: user.email,
-        subject: `Order Confirmation - ${order.orderId}`,
-        html,
-        text: `Your order ${order.orderId} has been confirmed. Total: ₹${order.total}`
-    });
+  return sendEmail({
+    to: user.email,
+    subject: `Order Confirmation - ${order.orderId}`,
+    html,
+    text: `Your order ${order.orderId} has been confirmed. Total: ₹${order.total}`
+  });
 };
 
 /**
  * Send Booking Confirmation Email
  */
 const sendBookingConfirmation = async (user, booking, service) => {
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -202,19 +212,19 @@ const sendBookingConfirmation = async (user, booking, service) => {
     </html>
   `;
 
-    return sendEmail({
-        to: user.email,
-        subject: `Booking Confirmed - ${booking.bookingId}`,
-        html,
-        text: `Your booking ${booking.bookingId} for ${service.name} has been confirmed for ${new Date(booking.scheduledDate).toLocaleDateString()}`
-    });
+  return sendEmail({
+    to: user.email,
+    subject: `Booking Confirmed - ${booking.bookingId}`,
+    html,
+    text: `Your booking ${booking.bookingId} for ${service.name} has been confirmed for ${new Date(booking.scheduledDate).toLocaleDateString()}`
+  });
 };
 
 /**
  * Send Enquiry Received Email
  */
 const sendEnquiryReceived = async (email, name, enquiry) => {
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -243,21 +253,21 @@ const sendEnquiryReceived = async (email, name, enquiry) => {
     </html>
   `;
 
-    return sendEmail({
-        to: email,
-        subject: `Enquiry Received - ${enquiry.enquiryId}`,
-        html,
-        text: `Your enquiry ${enquiry.enquiryId} has been received. We will respond within 24-48 hours.`
-    });
+  return sendEmail({
+    to: email,
+    subject: `Enquiry Received - ${enquiry.enquiryId}`,
+    html,
+    text: `Your enquiry ${enquiry.enquiryId} has been received. We will respond within 24-48 hours.`
+  });
 };
 
 /**
  * Send Password Reset Email
  */
 const sendPasswordResetEmail = async (user, resetToken) => {
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -288,19 +298,19 @@ const sendPasswordResetEmail = async (user, resetToken) => {
     </html>
   `;
 
-    return sendEmail({
-        to: user.email,
-        subject: 'Password Reset Request',
-        html,
-        text: `Reset your password using this link: ${resetUrl}`
-    });
+  return sendEmail({
+    to: user.email,
+    subject: 'Password Reset Request',
+    html,
+    text: `Reset your password using this link: ${resetUrl}`
+  });
 };
 
 module.exports = {
-    sendEmail,
-    sendWelcomeEmail,
-    sendOrderConfirmation,
-    sendBookingConfirmation,
-    sendEnquiryReceived,
-    sendPasswordResetEmail
+  sendEmail,
+  sendWelcomeEmail,
+  sendOrderConfirmation,
+  sendBookingConfirmation,
+  sendEnquiryReceived,
+  sendPasswordResetEmail
 };

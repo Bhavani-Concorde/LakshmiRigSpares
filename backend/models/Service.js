@@ -104,7 +104,7 @@ const serviceSchema = new mongoose.Schema({
 serviceSchema.index({ name: 'text', description: 'text', tags: 'text' });
 serviceSchema.index({ category: 1 });
 serviceSchema.index({ isActive: 1, isFeatured: 1 });
-serviceSchema.index({ slug: 1 });
+// serviceSchema.index({ slug: 1 }); // Removed to avoid duplicate index warning
 
 // Generate slug before saving
 serviceSchema.pre('save', function (next) {

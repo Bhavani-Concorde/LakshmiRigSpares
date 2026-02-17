@@ -3,7 +3,31 @@
  * Main entry point for the Express.js application
  */
 
-require('dotenv').config();
+const dotenv = require('dotenv');
+// Explicitly specify path to ensure it finds the file in the current directory
+const result = dotenv.config({ path: './.env' });
+
+if (result.error) {
+    console.error('Error loading .env file:', result.error);
+}
+
+// Global error handlers to prevent crashes
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+    console.error(err.name, err.message, err.stack);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.error(err);
+    process.exit(1);
+});
+
+console.log('Environment Variables Loaded Check:');
+console.log('- PORT:', process.env.PORT);
+console.log('- MONGO_URI:', process.env.MONGO_URI ? 'Loaded' : 'MISSING');
+
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -19,6 +43,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Initialize Express app
 const app = express();
@@ -43,6 +68,18 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
+// Ignore favicon.ico
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// Base API route - Handle both /api and /api/
+app.get(['/api', '/api/'], (req, res) => {
+    res.json({
+        success: true,
+        message: 'Sri Lakshmi Rig Spares API is running. Use /api/health for more details.',
+        env: process.env.NODE_ENV
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
@@ -62,6 +99,7 @@ app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/payments', paymentRoutes);
 
 // Serve static files
 const path = require('path');

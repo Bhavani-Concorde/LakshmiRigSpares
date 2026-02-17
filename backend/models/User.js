@@ -80,8 +80,8 @@ const userSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 });
+// userSchema.index({ email: 1 }); // Removed to avoid duplicate index warning
+// userSchema.index({ googleId: 1 }); // Removed to avoid duplicate index warning
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {

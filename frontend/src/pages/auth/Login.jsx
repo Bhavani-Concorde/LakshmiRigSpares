@@ -1,27 +1,16 @@
-/**
- * Login Page
- * User login with email/password and Google OAuth
- */
-
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useGoogleLogin } from '@react-oauth/google'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import toast from 'react-hot-toast'
-import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
-import { FcGoogle } from 'react-icons/fc'
 import './Auth.css'
 
 const Login = () => {
-    const [formData, setFormData] = useState({ email: '', password: '' })
-    const [showPassword, setShowPassword] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [googleLoading, setGoogleLoading] = useState(false)
-
-    const { login, googleLogin } = useAuth()
+    const { login } = useAuth()
     const navigate = useNavigate()
-    const location = useLocation()
-    const from = location.state?.from?.pathname || '/dashboard'
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    })
+    const [loading, setLoading] = useState(false)
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -29,130 +18,61 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!formData.email || !formData.password) {
-            toast.error('Please fill in all fields')
-            return
-        }
-
         setLoading(true)
         try {
-            const result = await login(formData.email, formData.password)
-            if (result.success) {
-                toast.success('Welcome back!')
-                navigate(from, { replace: true })
+            const success = await login(formData.email, formData.password)
+            if (success) {
+                navigate('/')
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed')
+            console.error('Login failed:', error)
         } finally {
             setLoading(false)
         }
     }
 
-    const handleGoogleSuccess = async (response) => {
-        setGoogleLoading(true)
-        try {
-            // Get the ID token from Google
-            const tokenResponse = await fetch(
-                `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${response.access_token}`
-            )
-            const userInfo = await tokenResponse.json()
-
-            // For a proper implementation, you'd use the ID token from the credential response
-            // Here we're simulating it with the access token for demo purposes
-            const result = await googleLogin(response.access_token)
-            if (result.success) {
-                toast.success('Welcome!')
-                navigate(from, { replace: true })
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Google login failed')
-        } finally {
-            setGoogleLoading(false)
-        }
-    }
-
-    const googleLoginHandler = useGoogleLogin({
-        onSuccess: handleGoogleSuccess,
-        onError: () => toast.error('Google login failed')
-    })
-
     return (
         <div className="auth-page">
             <h1 className="auth-title">Welcome Back</h1>
-            <p className="auth-subtitle">Sign in to your account to continue</p>
+            <p className="auth-subtitle">Sign in to your account</p>
 
-            {/* Google Login Button */}
-            <button
-                className="google-btn"
-                onClick={() => googleLoginHandler()}
-                disabled={googleLoading}
-            >
-                {googleLoading ? (
-                    <span className="btn-loader"></span>
-                ) : (
-                    <>
-                        <FcGoogle className="google-icon" />
-                        Continue with Google
-                    </>
-                )}
-            </button>
-
-            <div className="auth-divider">
-                <span>or continue with email</span>
-            </div>
-
-            <form onSubmit={handleSubmit} className="auth-form">
-                <div className="form-group">
-                    <label className="form-label">Email Address</label>
-                    <div className="input-wrapper">
-                        <FiMail className="input-icon" />
+            <div className="local-auth-wrapper">
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Email Address</label>
                         <input
                             type="email"
                             name="email"
+                            placeholder="Enter your email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="form-input"
-                            placeholder="Enter your email"
+                            required
                         />
                     </div>
-                </div>
-
-                <div className="form-group">
-                    <div className="label-row">
-                        <label className="form-label">Password</label>
-                        <Link to="/forgot-password" className="forgot-link">Forgot password?</Link>
-                    </div>
-                    <div className="input-wrapper">
-                        <FiLock className="input-icon" />
+                    <div className="form-group">
+                        <label>Password</label>
                         <input
-                            type={showPassword ? 'text' : 'password'}
+                            type="password"
                             name="password"
+                            placeholder="Enter your password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="form-input"
-                            placeholder="Enter your password"
+                            required
                         />
-                        <button
-                            type="button"
-                            className="password-toggle"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? <FiEyeOff /> : <FiEye />}
-                        </button>
                     </div>
+                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                        {loading ? 'Signing in...' : 'Sign In'}
+                    </button>
+                </form>
+            </div>
+
+            <div className="auth-footer-links">
+                <p className="auth-footer-text">
+                    Don't have an account? <Link to="/register">Create account</Link>
+                </p>
+                <div className="admin-link">
+                    <Link to="/admin/login">Admin Login →</Link>
                 </div>
-
-                <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-                    {loading ? <span className="btn-loader"></span> : 'Sign In'}
-                </button>
-            </form>
-
-            <p className="auth-footer-text">
-                Don't have an account? <Link to="/register">Create account</Link>
-            </p>
-
-            <div className="admin-link">
-                <Link to="/admin/login">Admin Login →</Link>
             </div>
         </div>
     )

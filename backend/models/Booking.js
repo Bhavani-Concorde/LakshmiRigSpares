@@ -114,7 +114,7 @@ const bookingSchema = new mongoose.Schema({
 bookingSchema.index({ user: 1, status: 1 });
 bookingSchema.index({ service: 1 });
 bookingSchema.index({ scheduledDate: 1 });
-bookingSchema.index({ bookingId: 1 });
+// bookingSchema.index({ bookingId: 1 }); // Removed to avoid duplicate index warning
 bookingSchema.index({ status: 1 });
 
 // Generate booking ID before saving

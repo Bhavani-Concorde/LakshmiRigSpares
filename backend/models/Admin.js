@@ -69,7 +69,7 @@ const adminSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-adminSchema.index({ email: 1 });
+// adminSchema.index({ email: 1 }); // Removed to avoid duplicate index warning
 
 // Virtual for checking if account is locked
 adminSchema.virtual('isLocked').get(function () {

@@ -137,8 +137,8 @@ const supplierSchema = new mongoose.Schema({
 
 // Indexes
 supplierSchema.index({ name: 'text', companyName: 'text' });
-supplierSchema.index({ email: 1 });
-supplierSchema.index({ supplierId: 1 });
+// supplierSchema.index({ email: 1 }); // Removed to avoid duplicate index warning
+// supplierSchema.index({ supplierId: 1 }); // Removed to avoid duplicate index warning
 supplierSchema.index({ status: 1 });
 supplierSchema.index({ categories: 1 });
 

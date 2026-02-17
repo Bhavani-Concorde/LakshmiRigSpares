@@ -19,6 +19,8 @@ import Services from './pages/Services'
 import ServiceDetail from './pages/ServiceDetail'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
 
 // Auth Pages
 import Login from './pages/auth/Login'
@@ -48,12 +50,18 @@ import AdminSuppliers from './pages/admin/Suppliers'
 // Components
 import PageLoader from './components/common/PageLoader'
 import ProtectedRoute from './components/common/ProtectedRoute'
+import TimeCheck from './components/TimeCheck'
 
 function App() {
     const { loading } = useAuth()
 
     if (loading) {
-        return <PageLoader />
+        return (
+            <>
+                <TimeCheck />
+                <PageLoader />
+            </>
+        )
     }
 
     return (
@@ -67,6 +75,7 @@ function App() {
                 <Route path="/services/:slug" element={<ServiceDetail />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/cart" element={<Cart />} />
             </Route>
 
             {/* Auth Routes */}
@@ -86,6 +95,7 @@ function App() {
                 <Route path="/my-enquiries" element={<UserEnquiries />} />
                 <Route path="/book-service/:serviceId" element={<BookService />} />
                 <Route path="/enquiry/new" element={<CreateEnquiry />} />
+                <Route path="/checkout" element={<Checkout />} />
             </Route>
 
             {/* Admin Routes */}

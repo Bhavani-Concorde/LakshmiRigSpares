@@ -94,6 +94,45 @@
     gap: var(--spacing-md);
 }
 
+.cart-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--dark-200);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 1.25rem;
+    transition: all var(--transition-fast);
+}
+
+.cart-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light-50);
+    transform: translateY(-2px);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--gradient-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--dark-900);
+}
+
 .auth-buttons {
     display: flex;
     align-items: center;

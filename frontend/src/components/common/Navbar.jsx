@@ -6,13 +6,15 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { FiMenu, FiX, FiUser, FiLogOut, FiShoppingBag, FiGrid, FiSettings } from 'react-icons/fi'
+import { useCart } from '../../context/CartContext'
+import { FiMenu, FiX, FiUser, FiLogOut, FiShoppingBag, FiGrid, FiSettings, FiShoppingCart } from 'react-icons/fi'
 import './Navbar.css'
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isProfileOpen, setIsProfileOpen] = useState(false)
     const { isAuthenticated, isAdmin, user, admin, logout } = useAuth()
+    const { getCartCount } = useCart()
     const navigate = useNavigate()
 
     const handleLogout = () => {
@@ -45,6 +47,10 @@ const Navbar = () => {
 
                 {/* Actions */}
                 <div className="navbar-actions">
+                    <Link to="/cart" className="cart-trigger">
+                        <FiShoppingCart />
+                        {getCartCount() > 0 && <span className="cart-badge">{getCartCount()}</span>}
+                    </Link>
                     {isAuthenticated ? (
                         <div className="profile-dropdown">
                             <button

@@ -38,8 +38,8 @@ const registerUser = asyncHandler(async (req, res) => {
         });
     }
 
-    // Create user
-    const user = await User.create({
+    // Create user instance (don't save to DB yet)
+    const user = new User({
         name,
         email: email.toLowerCase(),
         password,
@@ -53,6 +53,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Save refresh token to user
     user.refreshToken = refreshToken;
+
+    // Save user (this will hash the password once)
     await user.save();
 
     // Send welcome email (async, don't wait)
@@ -168,97 +170,13 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Google OAuth login/register
+ * @desc    Google OAuth login/register (Legacy - Disabled)
  * @route   POST /api/auth/google
  * @access  Public
  */
-const googleAuth = asyncHandler(async (req, res) => {
-    const { credential } = req.body;
-
-    if (!credential) {
-        return res.status(400).json({
-            success: false,
-            message: 'Google credential is required'
-        });
-    }
-
-    try {
-        // Verify Google token
-        const ticket = await googleClient.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID
-        });
-
-        const payload = ticket.getPayload();
-        const { sub: googleId, email, name, picture } = payload;
-
-        // Check if user exists
-        let user = await User.findOne({
-            $or: [{ googleId }, { email: email.toLowerCase() }]
-        });
-
-        if (user) {
-            // Update Google info if needed
-            if (!user.googleId) {
-                user.googleId = googleId;
-                user.authProvider = 'google';
-            }
-            if (picture && !user.avatar) {
-                user.avatar = picture;
-            }
-            user.lastLogin = new Date();
-        } else {
-            // Create new user
-            user = await User.create({
-                name,
-                email: email.toLowerCase(),
-                googleId,
-                avatar: picture,
-                authProvider: 'google',
-                isVerified: true,
-                lastLogin: new Date()
-            });
-
-            // Send welcome email
-            sendWelcomeEmail(user).catch(err => console.error('Welcome email failed:', err));
-        }
-
-        // Generate tokens
-        const { accessToken, refreshToken } = generateTokens(user, 'user');
-        user.refreshToken = refreshToken;
-        await user.save();
-
-        // Set cookies
-        res.cookie('token', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 24 * 60 * 60 * 1000
-        });
-
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-
-        res.json({
-            success: true,
-            message: 'Google login successful',
-            data: {
-                user: user.toPublicJSON(),
-                token: accessToken
-            }
-        });
-    } catch (error) {
-        console.error('Google auth error:', error);
-        res.status(401).json({
-            success: false,
-            message: 'Invalid Google credential'
-        });
-    }
-});
+const clerkSync = (req, res) => {
+    res.status(410).json({ success: false, message: 'Clerk integration has been removed.' });
+};
 
 /**
  * @desc    Get current user profile
@@ -501,7 +419,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    googleAuth,
+    clerkSync,
     getProfile,
     updateProfile,
     updatePassword,

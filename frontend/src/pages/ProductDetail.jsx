@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { productsAPI, enquiriesAPI } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 import toast from 'react-hot-toast'
 import { FiShoppingCart, FiMessageSquare, FiCheck, FiPackage, FiTruck, FiShield, FiArrowLeft } from 'react-icons/fi'
 import './ProductDetail.css'
@@ -13,6 +14,7 @@ import './ProductDetail.css'
 const ProductDetail = () => {
     const { slug } = useParams()
     const { isAuthenticated } = useAuth()
+    const { addToCart } = useCart()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
     const [selectedImage, setSelectedImage] = useState(0)
@@ -134,8 +136,12 @@ const ProductDetail = () => {
                             <button className="btn btn-primary btn-lg" onClick={() => setEnquiryModal(true)}>
                                 <FiMessageSquare /> Send Enquiry
                             </button>
-                            <button className="btn btn-secondary btn-lg" disabled={product.stock === 0}>
-                                <FiShoppingCart /> Add to Order
+                            <button
+                                className="btn btn-secondary btn-lg"
+                                disabled={product.stock === 0}
+                                onClick={() => addToCart(product, quantity)}
+                            >
+                                <FiShoppingCart /> Add to Cart
                             </button>
                         </div>
 

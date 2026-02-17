@@ -30,8 +30,8 @@ const AdminLogin = () => {
 
         setLoading(true)
         try {
-            const result = await adminLogin(formData.email, formData.password)
-            if (result.success) {
+            const success = await adminLogin(formData.email, formData.password)
+            if (success) {
                 toast.success('Welcome, Admin!')
                 navigate('/admin')
             }

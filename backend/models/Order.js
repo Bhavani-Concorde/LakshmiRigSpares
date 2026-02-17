@@ -83,7 +83,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['cash', 'bank_transfer', 'cheque', 'upi', 'card', 'credit'],
+        enum: ['cash', 'bank_transfer', 'cheque', 'upi', 'card', 'credit', 'online', 'razorpay'],
         required: true
     },
     paymentStatus: {
@@ -154,7 +154,7 @@ const orderSchema = new mongoose.Schema({
 
 // Indexes
 orderSchema.index({ user: 1, status: 1 });
-orderSchema.index({ orderId: 1 });
+// orderSchema.index({ orderId: 1 }); // Removed to avoid duplicate index warning
 orderSchema.index({ status: 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });

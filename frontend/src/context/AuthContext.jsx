@@ -1,155 +1,157 @@
-/**
- * Authentication Context
- * Manages user authentication state across the application
- */
-
 import { createContext, useContext, useState, useEffect } from 'react'
 import api from '../services/api'
+import toast from 'react-hot-toast'
+import PropTypes from 'prop-types'
 
-const AuthContext = createContext(null)
+const AuthContext = createContext()
 
-export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider')
-    }
-    return context
-}
+export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
-    const [admin, setAdmin] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isAdmin, setIsAdmin] = useState(false)
+    const [loading, setLoading] = useState(true)
 
-    // Check for existing auth on mount
+    // Initialize Auth State on Startup
     useEffect(() => {
-        checkAuth()
-    }, [])
-
-    const checkAuth = async () => {
-        try {
+        const initAuth = async () => {
             const token = localStorage.getItem('token')
+            const adminToken = localStorage.getItem('adminToken')
             const userType = localStorage.getItem('userType')
 
-            if (!token) {
-                setLoading(false)
-                return
-            }
-
-            if (userType === 'admin') {
-                const { data } = await api.get('/admin/profile')
-                if (data.success) {
-                    setAdmin(data.data)
-                    setIsAdmin(true)
-                    setIsAuthenticated(true)
-                }
-            } else {
-                const { data } = await api.get('/auth/profile')
-                if (data.success) {
+            if (adminToken && userType === 'admin') {
+                try {
+                    const { data } = await api.get('/admin/profile')
                     setUser(data.data)
                     setIsAuthenticated(true)
+                    setIsAdmin(true)
+                } catch (error) {
+                    console.error('Admin auto-login failed:', error)
+                    localStorage.removeItem('adminToken')
+                    localStorage.removeItem('userType')
+                }
+            } else if (token && userType === 'user') {
+                try {
+                    const { data } = await api.get('/auth/profile')
+                    setUser(data.data)
+                    setIsAuthenticated(true)
+                    setIsAdmin(false)
+                } catch (error) {
+                    console.error('User auto-login failed:', error)
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('userType')
                 }
             }
-        } catch (error) {
-            console.error('Auth check failed:', error)
-            logout()
-        } finally {
             setLoading(false)
         }
-    }
 
-    const login = async (email, password) => {
-        const { data } = await api.post('/auth/login', { email, password })
-        if (data.success) {
-            localStorage.setItem('token', data.data.token)
-            localStorage.setItem('userType', 'user')
-            setUser(data.data.user)
-            setIsAuthenticated(true)
-            setIsAdmin(false)
-        }
-        return data
-    }
+        initAuth()
+    }, [])
 
+    // --- Actions ---
+
+    // Standard User Registration
     const register = async (userData) => {
-        const { data } = await api.post('/auth/register', userData)
-        if (data.success) {
-            localStorage.setItem('token', data.data.token)
-            localStorage.setItem('userType', 'user')
-            setUser(data.data.user)
-            setIsAuthenticated(true)
-            setIsAdmin(false)
+        try {
+            const { data } = await api.post('/auth/register', userData)
+            if (data.success) {
+                localStorage.setItem('token', data.data.token)
+                localStorage.setItem('userType', 'user')
+                setUser(data.data.user)
+                setIsAuthenticated(true)
+                setIsAdmin(false)
+                toast.success('Registration Successful')
+                return true
+            }
+        } catch (error) {
+            console.error('Registration Error:', error)
+            toast.error(error.response?.data?.message || 'Registration failed')
+            throw error
         }
-        return data
     }
 
-    const googleLogin = async (credential) => {
-        const { data } = await api.post('/auth/google', { credential })
-        if (data.success) {
-            localStorage.setItem('token', data.data.token)
-            localStorage.setItem('userType', 'user')
-            setUser(data.data.user)
-            setIsAuthenticated(true)
-            setIsAdmin(false)
+    // Standard User Login
+    const login = async (email, password) => {
+        try {
+            const { data } = await api.post('/auth/login', { email, password })
+            if (data.success) {
+                localStorage.setItem('token', data.data.token)
+                localStorage.setItem('userType', 'user')
+                setUser(data.data.user)
+                setIsAuthenticated(true)
+                setIsAdmin(false)
+                toast.success('Login Successful')
+                return true
+            }
+        } catch (error) {
+            console.error('Login Error:', error)
+            toast.error(error.response?.data?.message || 'Login failed')
+            throw error
         }
-        return data
     }
 
+    // Admin Login
     const adminLogin = async (email, password) => {
-        const { data } = await api.post('/admin/login', { email, password })
-        if (data.success) {
-            localStorage.setItem('token', data.data.token)
-            localStorage.setItem('userType', 'admin')
-            setAdmin(data.data.admin)
-            setIsAuthenticated(true)
-            setIsAdmin(true)
+        try {
+            const { data } = await api.post('/admin/login', { email, password })
+            if (data.success) {
+                localStorage.setItem('adminToken', data.token)
+                localStorage.setItem('userType', 'admin')
+                setUser(data.admin)
+                setIsAuthenticated(true)
+                setIsAdmin(true)
+                toast.success('Admin Login Successful')
+                return true
+            }
+        } catch (error) {
+            console.error('Admin Login Error:', error)
+            toast.error(error.response?.data?.message || 'Admin Login failed')
+            throw error
         }
-        return data
     }
 
+    // Universal Logout
     const logout = () => {
         localStorage.removeItem('token')
+        localStorage.removeItem('adminToken')
         localStorage.removeItem('userType')
         setUser(null)
-        setAdmin(null)
         setIsAuthenticated(false)
         setIsAdmin(false)
+        toast.success('Logged out successfully')
     }
 
-    const updateProfile = async (profileData) => {
-        const endpoint = isAdmin ? '/admin/profile' : '/auth/profile'
-        const { data } = await api.put(endpoint, profileData)
-        if (data.success) {
-            if (isAdmin) {
-                setAdmin(data.data)
-            } else {
-                setUser(data.data)
-            }
+    const updateProfile = async (data) => {
+        try {
+            const endpoint = isAdmin ? '/admin/profile' : '/auth/profile'
+            const response = await api.put(endpoint, data)
+            setUser(response.data.data)
+            toast.success('Profile updated')
+            return response.data
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Update failed')
+            throw error
         }
-        return data
-    }
-
-    const value = {
-        user,
-        admin,
-        loading,
-        isAuthenticated,
-        isAdmin,
-        login,
-        register,
-        googleLogin,
-        adminLogin,
-        logout,
-        updateProfile,
-        checkAuth
     }
 
     return (
-        <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={{
+            user,
+            isAuthenticated,
+            isAdmin,
+            loading,
+            register,
+            login,
+            adminLogin,
+            logout,
+            updateProfile
+        }}>
             {children}
         </AuthContext.Provider>
     )
 }
 
-export default AuthContext
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired
+}
