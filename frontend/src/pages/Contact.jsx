@@ -88,22 +88,22 @@ const Contact = () => {
                         <div className="info-card">
                             <div className="info-icon"><FiMapPin /></div>
                             <h3>Our Address</h3>
-                            <p>123 Industrial Area, Padi<br />Chennai, Tamil Nadu 600050<br />India</p>
+                            <p>Perumanallur Road<br />Kunnathur,Tiruppur Tamil Nadu 638103<br />India</p>
                         </div>
                         <div className="info-card">
                             <div className="info-icon"><FiPhone /></div>
                             <h3>Phone Number</h3>
-                            <p>+91 98765 43210<br />+91 44 2345 6789</p>
+                            <p>+91 9842764681</p>
                         </div>
                         <div className="info-card">
                             <div className="info-icon"><FiMail /></div>
                             <h3>Email Address</h3>
-                            <p>info@srilakshmirigs.com<br />sales@srilakshmirigs.com</p>
+                            <p>srilakshmirigspares2788@gmail.com</p>
                         </div>
                         <div className="info-card">
                             <div className="info-icon"><FiClock /></div>
                             <h3>Working Hours</h3>
-                            <p>Mon - Sat: 9:00 AM - 6:00 PM<br />Sunday: Closed</p>
+                            <p>Mon - Sat: 9:00 AM - 8:00 PM<br />Sunday: Closed</p>
                         </div>
                     </div>
                 </div>

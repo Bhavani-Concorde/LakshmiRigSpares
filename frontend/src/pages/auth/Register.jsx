@@ -14,21 +14,32 @@ const Register = () => {
         company: ''
     })
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
+        if (error) setError('') // Clear error when user starts typing
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
+        setError('')
+
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters.')
+            setLoading(false)
+            return
+        }
+
         try {
             const success = await register(formData)
             if (success) {
                 navigate('/')
             }
-        } catch (error) {
-            console.error('Registration failed:', error)
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Registration failed. Please try again.'
+            setError(msg)
         } finally {
             setLoading(false)
         }
@@ -40,6 +51,11 @@ const Register = () => {
             <p className="auth-subtitle">Join us today</p>
 
             <div className="local-auth-wrapper">
+                {error && (
+                    <div className="auth-error-msg">
+                        <span>⚠</span> {error}
+                    </div>
+                )}
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Full Name</label>
@@ -88,7 +104,7 @@ const Register = () => {
                         <input
                             type="password"
                             name="password"
-                            placeholder="Create a strong password"
+                            placeholder="Create a strong password (min 6 chars)"
                             value={formData.password}
                             onChange={handleChange}
                             required

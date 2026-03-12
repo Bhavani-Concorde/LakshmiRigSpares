@@ -57,7 +57,7 @@ const AdminServices = () => {
             // We need to make sure we prepend the backend URL if it's relative, or just store the path
             // The image src in preview needs to be full URL if running on different port
             // Let's assume proxy handles /uploads or we prepend valid URL
-            const imageUrl = `http://localhost:5000${response.data.imageUrl}`
+            const imageUrl = response.data.imageUrl
             setFormData(prev => ({ ...prev, image: imageUrl }))
             toast.success('Image uploaded!')
         } catch (error) {

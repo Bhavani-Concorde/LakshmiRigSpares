@@ -11,21 +11,25 @@ const Login = () => {
         password: ''
     })
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
+        if (error) setError('') // Clear error when user starts typing
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
+        setError('')
         try {
             const success = await login(formData.email, formData.password)
             if (success) {
                 navigate('/')
             }
-        } catch (error) {
-            console.error('Login failed:', error)
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Login failed. Please check your credentials.'
+            setError(msg)
         } finally {
             setLoading(false)
         }
@@ -37,6 +41,11 @@ const Login = () => {
             <p className="auth-subtitle">Sign in to your account</p>
 
             <div className="local-auth-wrapper">
+                {error && (
+                    <div className="auth-error-msg">
+                        <span>⚠</span> {error}
+                    </div>
+                )}
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Email Address</label>
@@ -68,7 +77,7 @@ const Login = () => {
 
             <div className="auth-footer-links">
                 <p className="auth-footer-text">
-                    Don't have an account? <Link to="/register">Create account</Link>
+                    Don&apos;t have an account? <Link to="/register">Create account</Link>
                 </p>
                 <div className="admin-link">
                     <Link to="/admin/login">Admin Login →</Link>

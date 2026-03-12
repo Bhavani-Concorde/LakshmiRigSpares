@@ -11,8 +11,8 @@
 }
 
 .profile-sidebar {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(225, 68, 68, 0.03);
+    border: 1px solid rgba(225, 66, 66, 0.08);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
     text-align: center;
@@ -88,7 +88,7 @@
     font-size: 1.25rem;
     margin-bottom: var(--spacing-lg);
     padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(225, 71, 71, 0.08);
 }
 
 .form-row {

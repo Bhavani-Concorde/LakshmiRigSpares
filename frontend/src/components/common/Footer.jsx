@@ -63,15 +63,15 @@ const Footer = () => {
                         <ul className="footer-contact">
                             <li>
                                 <FiMapPin className="contact-icon" />
-                                <span>123 Industrial Area, Chennai, Tamil Nadu, India</span>
+                                <span>Perumanallur Road,Kunnathur,Tiruppur Dist, Tamil Nadu, India</span>
                             </li>
                             <li>
                                 <FiPhone className="contact-icon" />
-                                <span>+91 98765 43210</span>
+                                <span>+91 9842764681</span>
                             </li>
                             <li>
                                 <FiMail className="contact-icon" />
-                                <span>info@srilakshmirigs.com</span>
+                                <span>srilakshmirigspares2788@gmail.com</span>
                             </li>
                         </ul>
                     </div>

@@ -12,8 +12,8 @@ const seedAdmin = async () => {
     try {
         await connectDB();
 
-        const adminEmail = 'admin@slrs.com';
-        const adminPassword = 'Admin@12345';
+        const adminEmail = 'srilakshmirigspares2788@gmail.com';
+        const adminPassword = 'Admin@123';
 
         // Check if admin exists
         let adminExists = await Admin.findOne({ email: adminEmail });

@@ -20,12 +20,14 @@ const {
 router.get('/', getProducts);
 router.get('/categories', getCategories);
 router.get('/slug/:slug', getProductBySlug);
-router.get('/:id', getProduct);
 
-// Admin routes
+// Admin routes (must be BEFORE /:id to avoid "admin" being treated as an ID)
+router.get('/admin/all', protect, adminOnly, checkPermission('manageProducts'), getAdminProducts);
 router.post('/', protect, adminOnly, checkPermission('manageProducts'), createProduct);
 router.put('/:id', protect, adminOnly, checkPermission('manageProducts'), updateProduct);
 router.delete('/:id', protect, adminOnly, checkPermission('manageProducts'), deleteProduct);
-router.get('/admin/all', protect, adminOnly, checkPermission('manageProducts'), getAdminProducts);
+
+// Parameterized route must be last
+router.get('/:id', getProduct);
 
 module.exports = router;

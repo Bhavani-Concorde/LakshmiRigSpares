@@ -102,9 +102,11 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // Find user with password
+    console.log(`Login attempt for email: ${email.toLowerCase()}`);
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user) {
+        console.log(`Login failed: User not found for email ${email.toLowerCase()}`);
         return res.status(401).json({
             success: false,
             message: 'Invalid credentials'
@@ -113,6 +115,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Check if user registered with Google
     if (user.authProvider === 'google' && !user.password) {
+        console.log(`Login failed: Google account for email ${email.toLowerCase()}`);
         return res.status(401).json({
             success: false,
             message: 'This account uses Google login. Please sign in with Google.'
@@ -121,6 +124,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Check password
     const isMatch = await user.comparePassword(password);
+    console.log(`Password match for ${email.toLowerCase()}: ${isMatch}`);
     if (!isMatch) {
         return res.status(401).json({
             success: false,
@@ -130,6 +134,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Check if account is active
     if (!user.isActive) {
+        console.log(`Login failed: Account inactive for ${email.toLowerCase()}`);
         return res.status(401).json({
             success: false,
             message: 'Your account has been deactivated. Please contact support.'

@@ -1,8 +1,17 @@
 const crypto = require('crypto');
-const razorpay = require('../config/razorpay');
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
 const Booking = require('../models/Booking');
+
+const isDev = process.env.NODE_ENV !== 'production';
+const isPlaceholderKeys = () => {
+    const keyId = process.env.RAZORPAY_KEY_ID || '';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || '';
+    // Check if keys are empty or still using the placeholder strings
+    return !keyId || !keySecret ||
+        keyId.includes('AbCdEf123456') ||
+        keySecret.includes('xyz123456789abcdef');
+};
 
 /**
  * Create Razorpay Order
@@ -16,16 +25,34 @@ exports.createOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Amount is required' });
         }
 
-        const options = {
-            amount: Math.round(amount * 100), // Razorpay expects amount in paise
-            currency,
-            receipt: `receipt_${Date.now()}`,
-        };
+        const amountInPaise = Math.round(amount * 100);
+        let razorpayOrder;
 
-        const razorpayOrder = await razorpay.orders.create(options);
+        // DEV MODE with placeholder keys — skip Razorpay API entirely
+        if (isDev && isPlaceholderKeys()) {
+            console.warn('⚠️  DEV MODE: Simulating Razorpay order (placeholder API keys detected).');
+            console.warn('   Replace RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env with real keys for production.');
+            razorpayOrder = {
+                id: `order_dev_${Date.now()}`,
+                amount: amountInPaise,
+                currency: currency,
+                status: 'created',
+                _devMode: true
+            };
+        } else {
+            // REAL MODE — call Razorpay API
+            const razorpay = require('../config/razorpay');
+            const options = {
+                amount: amountInPaise,
+                currency,
+                receipt: `receipt_${Date.now()}`,
+            };
 
-        if (!razorpayOrder) {
-            return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
+            razorpayOrder = await razorpay.orders.create(options);
+
+            if (!razorpayOrder) {
+                return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
+            }
         }
 
         // Save payment attempt in database
@@ -43,6 +70,7 @@ exports.createOrder = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            devMode: razorpayOrder._devMode || false,
             order: {
                 id: razorpayOrder.id,
                 amount: razorpayOrder.amount,
@@ -67,14 +95,52 @@ exports.verifyPayment = async (req, res) => {
             razorpay_signature
         } = req.body;
 
-        const sign = razorpay_order_id + "|" + razorpay_payment_id;
+        // DEV MODE: Auto-verify simulated payments
+        const isDevPayment = razorpay_order_id && razorpay_order_id.startsWith('order_dev_');
+
+        if (isDevPayment && isDev) {
+            console.warn('⚠️  DEV MODE: Auto-verifying simulated payment for order:', razorpay_order_id);
+
+            const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
+
+            if (!payment) {
+                return res.status(404).json({ success: false, message: 'Payment record not found' });
+            }
+
+            payment.razorpayPaymentId = razorpay_payment_id || `pay_dev_${Date.now()}`;
+            payment.razorpaySignature = razorpay_signature || 'dev_signature';
+            payment.status = 'captured';
+            await payment.save();
+
+            // Update associated Order or Booking
+            if (payment.orderId) {
+                await Order.findByIdAndUpdate(payment.orderId, {
+                    paymentStatus: 'paid',
+                    'paymentDetails.transactionId': payment.razorpayPaymentId,
+                    'paymentDetails.paidAmount': payment.amount,
+                    'paymentDetails.paidAt': new Date()
+                });
+            } else if (payment.bookingId) {
+                await Booking.findByIdAndUpdate(payment.bookingId, {
+                    paymentStatus: 'paid'
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Payment verified successfully (DEV MODE)',
+                paymentId: payment.razorpayPaymentId
+            });
+        }
+
+        // PRODUCTION: Real signature verification
+        const sign = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSign = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
             .update(sign.toString())
-            .digest("hex");
+            .digest('hex');
 
         if (razorpay_signature === expectedSign) {
-            // Payment verified
             const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
 
             if (!payment) {
@@ -86,7 +152,6 @@ exports.verifyPayment = async (req, res) => {
             payment.status = 'captured';
             await payment.save();
 
-            // Update associated Order or Booking
             if (payment.orderId) {
                 await Order.findByIdAndUpdate(payment.orderId, {
                     paymentStatus: 'paid',
@@ -102,11 +167,11 @@ exports.verifyPayment = async (req, res) => {
 
             return res.status(200).json({
                 success: true,
-                message: "Payment verified successfully",
+                message: 'Payment verified successfully',
                 paymentId: razorpay_payment_id
             });
         } else {
-            return res.status(400).json({ success: false, message: "Invalid signature sent!" });
+            return res.status(400).json({ success: false, message: 'Invalid signature sent!' });
         }
     } catch (error) {
         console.error('Error verifying payment:', error);

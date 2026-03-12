@@ -7,10 +7,10 @@ import './About.css'
 
 const About = () => {
     const stats = [
-        { value: '30+', label: 'Years Experience' },
-        { value: '1000+', label: 'Happy Clients' },
-        { value: '500+', label: 'Products' },
-        { value: '50+', label: 'Team Members' }
+        { value: '10+', label: 'Years Experience' },
+        { value: '100+', label: 'Happy Clients' },
+        { value: '500', label: 'Products' },
+        { value: '10+', label: 'Team Members' }
     ]
 
     const values = [
@@ -28,7 +28,7 @@ const About = () => {
                     <div className="hero-content">
                         <h1 className="hero-title">About <span className="gradient-text">Sri Lakshmi Rig Spares</span></h1>
                         <p className="hero-description">
-                            Since 1990, we have been a trusted name in the industrial equipment sector,
+                            Since 2017, we have been a trusted name in the industrial equipment sector,
                             providing premium quality rig spares, drilling tools, and professional services
                             to the oil & gas industry across India.
                         </p>
@@ -57,7 +57,7 @@ const About = () => {
                         <div className="story-content">
                             <h2>Our Story</h2>
                             <p>
-                                Sri Lakshmi Rig Spares was founded in 1990 with a vision to become the
+                                Sri Lakshmi Rig Spares was founded in 2017 with a vision to become the
                                 leading supplier of industrial equipment in India. What started as a small
                                 trading company has grown into a comprehensive industrial solutions provider.
                             </p>
@@ -73,7 +73,7 @@ const About = () => {
                             </p>
                         </div>
                         <div className="story-image">
-                            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop" alt="Our facility" />
+                            <img src="https://content.jdmagicbox.com/v2/comp/erode/z3/9999px424.x424.231225083511.m3z3/catalogue/sri-lakshmi-rig-spares-kunnathur-erode-93qj7yi9p5.jpg" alt="Our facility" />
                         </div>
                     </div>
                 </div>

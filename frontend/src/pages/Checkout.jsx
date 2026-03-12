@@ -97,7 +97,8 @@ const Checkout = () => {
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            toast.error(error.response?.data?.message || 'Failed to place order');
+            const serverMsg = error.response?.data?.message;
+            toast.error(serverMsg || 'Failed to place order. Please check all fields.');
         } finally {
             setLoading(false);
         }
@@ -177,7 +178,7 @@ const Checkout = () => {
                                     <div className="payment-method-icon"><FiCreditCard /></div>
                                     <div className="payment-method-info">
                                         <div className="payment-method-name">Online Payment</div>
-                                        <div className="payment-method-desc">Pay securely via Razorpay (UPI, Card, NetBanking)</div>
+                                        <div className="payment-method-desc">Pay securely via Razorpay (GPay, UPI, QR, Cards)</div>
                                     </div>
                                     {paymentMethod === 'online' && <FiCheckCircle style={{ color: 'var(--primary-500)' }} />}
                                 </div>

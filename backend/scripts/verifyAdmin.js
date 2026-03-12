@@ -8,7 +8,7 @@ dotenv.config({ path: './.env' });
 const checkAdmin = async () => {
     try {
         await connectDB();
-        const adminEmail = 'admin@slrs.com';
+        const adminEmail = 'srilakshmirigspares2788@gmail.com';
         const admin = await Admin.findOne({ email: adminEmail }).select('+password');
 
         if (admin) {

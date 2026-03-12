@@ -308,3 +308,24 @@
     margin-top: var(--spacing-md);
     text-align: center;
 }
+
+/* Inline Error Message */
+.auth-error-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: var(--radius-md);
+    color: #f87171;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    margin-bottom: var(--spacing-md);
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

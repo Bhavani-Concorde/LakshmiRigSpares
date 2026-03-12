@@ -96,9 +96,9 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data } = await api.post('/admin/login', { email, password })
             if (data.success) {
-                localStorage.setItem('adminToken', data.token)
+                localStorage.setItem('adminToken', data.data.token)
                 localStorage.setItem('userType', 'admin')
-                setUser(data.admin)
+                setUser(data.data.admin)
                 setIsAuthenticated(true)
                 setIsAdmin(true)
                 toast.success('Admin Login Successful')

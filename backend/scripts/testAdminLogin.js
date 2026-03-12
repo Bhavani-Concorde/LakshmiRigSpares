@@ -10,8 +10,8 @@ const testAdminLogin = async () => {
         await connectDB();
         console.log('Testing Admin Login...');
 
-        const email = 'admin@slrs.com';
-        const password = 'Admin@12345';
+        const email = 'srilakshmirigspares2788@gmail.com';
+        const password = 'Admin@123';
 
         const admin = await Admin.findOne({ email: email.toLowerCase() }).select('+password');
 
@@ -37,7 +37,7 @@ const testAdminLogin = async () => {
             console.log('Credentials are valid.');
         } else {
             console.log('❌ PASSWORD MISMATCH');
-            console.log('The password in the database does NOT match "Admin@12345".');
+            console.log('The password in the database does NOT match "Admin@123".');
 
             // Should we reset it?
             console.log('Resetting password to ensure it works...');
@@ -46,7 +46,7 @@ const testAdminLogin = async () => {
             admin.loginAttempts = 0;
             admin.lockUntil = undefined;
             await admin.save();
-            console.log('✅ Password has been reset to "Admin@12345". Try logging in now.');
+            console.log('✅ Password has been reset to "Admin@123". Try logging in now.');
         }
 
         process.exit(0);
