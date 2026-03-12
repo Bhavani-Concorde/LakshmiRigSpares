@@ -1,5 +1,10 @@
 .env
 node_modules/
+# Environment files
+.env
+.env.*
+frontend/.env
+backend/.env
 
 # Logs
 logs
