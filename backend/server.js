@@ -4,7 +4,8 @@
  */
 
 const dotenv = require('dotenv');
-// Explicitly specify path to ensure it finds the file in the current directory
+
+// Load environment variables
 const result = dotenv.config({ path: './.env' });
 
 if (result.error) {
@@ -31,6 +32,8 @@ console.log('- MONGO_URI:', process.env.MONGO_URI ? 'Loaded' : 'MISSING');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -44,6 +47,7 @@ const enquiryRoutes = require('./routes/enquiryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 // Initialize Express app
 const app = express();
@@ -60,13 +64,9 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (e.g. mobile apps, Postman, curl)
-        // Also allow ANY localhost origin during development for Vite
         if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
             callback(null, true);
         } else {
-            // Passing false instead of an Error prevents a 500 server crash 
-            // and instead lets the browser handle the CORS rejection gracefully
             callback(null, false);
         }
     },
@@ -76,8 +76,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Explicitly handle OPTIONS preflight requests for all routes
 app.options('*', cors(corsOptions));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
@@ -90,10 +90,19 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 
-// Ignore favicon.ico
+// Ignore favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-// Base API route - Handle both /api and /api/
+/**
+ * ROOT ROUTE (Important for Render)
+ */
+app.get('/', (req, res) => {
+    res.send('Sri Lakshmi Rig Spares API is running 🚀');
+});
+
+/**
+ * Base API Route
+ */
 app.get(['/api', '/api/'], (req, res) => {
     res.json({
         success: true,
@@ -102,7 +111,9 @@ app.get(['/api', '/api/'], (req, res) => {
     });
 });
 
-// Health check endpoint
+/**
+ * Health Check Endpoint
+ */
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
@@ -111,7 +122,9 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// API Routes
+/**
+ * API Routes
+ */
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/products', productRoutes);
@@ -120,26 +133,32 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/suppliers', supplierRoutes);
-app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/upload', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 
-// Serve static files
-const path = require('path');
+/**
+ * Serve Static Files
+ */
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-// Error handling
+/**
+ * Error Handling Middleware
+ */
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
+/**
+ * Start Server
+ */
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
     console.log(`
-  🏭 Sri Lakshmi Rig Spares API Server
-  =====================================
-  🚀 Server running on port ${PORT}
-  📍 Environment: ${process.env.NODE_ENV || 'development'}
-  🔗 API URL: http://localhost:${PORT}/api
-  =====================================
-  `);
+🏭 Sri Lakshmi Rig Spares API Server
+=====================================
+🚀 Server running on port ${PORT}
+📍 Environment: ${process.env.NODE_ENV || 'development'}
+🔗 API URL: http://localhost:${PORT}/api
+=====================================
+`);
 });
