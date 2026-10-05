@@ -1,0 +1,133 @@
+/* Service Detail Page Styles */
+
+.service-detail-page {
+    padding: var(--spacing-2xl) 0;
+}
+
+.service-detail {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--spacing-2xl);
+}
+
+.service-image-main {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+}
+
+.service-image-main img {
+    width: 100%;
+    height: auto;
+}
+
+.service-content .service-category {
+    display: inline-block;
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--primary-400);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.service-title {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.service-desc {
+    color: var(--dark-300);
+    line-height: 1.8;
+    margin-bottom: var(--spacing-xl);
+    white-space: pre-wrap;
+}
+
+.service-features-list h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.service-features-list ul {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.service-features-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--dark-200);
+}
+
+.service-features-list li svg {
+    color: var(--success);
+}
+
+/* Sidebar */
+.service-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.booking-card {
+    padding: var(--spacing-xl);
+}
+
+.pricing-box {
+    text-align: center;
+    padding-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pricing-box .price {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pricing-box .price-type {
+    color: var(--dark-400);
+    font-size: 0.9rem;
+}
+
+.service-quick-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dark-300);
+    font-size: 0.9rem;
+}
+
+.btn-block {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.btn-block:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+    .service-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .service-sidebar {
+        position: static;
+    }
+}

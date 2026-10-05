@@ -1,0 +1,19 @@
+/* Main Layout Styles */
+
+.main-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding-top: 72px;
+    /* Navbar height */
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding-top: 64px;
+    }
+}

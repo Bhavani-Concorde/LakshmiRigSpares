@@ -1,0 +1,142 @@
+/* About Page Styles */
+
+.about-page {
+    overflow: hidden;
+}
+
+.about-hero {
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.about-hero .hero-title {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.about-hero .hero-description {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    color: var(--dark-300);
+    line-height: 1.8;
+}
+
+.about-stats {
+    padding: var(--spacing-2xl) 0;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.about-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.stat-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-card .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-card .stat-label {
+    color: var(--dark-400);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-2xl);
+    align-items: center;
+}
+
+.story-content h2 {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.story-content p {
+    color: var(--dark-300);
+    line-height: 1.8;
+    margin-bottom: var(--spacing-md);
+}
+
+.story-image img {
+    width: 100%;
+    border-radius: var(--radius-xl);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.value-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.value-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--spacing-md);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.value-card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+}
+
+.value-card p {
+    font-size: 0.9rem;
+    color: var(--dark-400);
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+
+    .about-stats .stats-grid,
+    .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .story-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-hero .hero-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .about-stats .stats-grid,
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+}
