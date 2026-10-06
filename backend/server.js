@@ -3,7 +3,9 @@
  * Main entry point for the Express.js application
  */
 
+// const dotenv = require('dotenv');
 const dotenv = require('dotenv');
+dotenv.config();
 
 // Load environment variables
 const result = dotenv.config({ path: './.env' });
@@ -150,15 +152,40 @@ app.use(errorHandler);
 /**
  * Start Server
  */
+// const PORT = process.env.PORT || 5000;
+
+// app.listen(PORT, () => {
+//     console.log(`
+// 🏭 Sri Lakshmi Rig Spares API Server
+// =====================================
+// 🚀 Server running on port ${PORT}
+// 📍 Environment: ${process.env.NODE_ENV || 'development'}
+// 🔗 API URL: http://localhost:${PORT}/api
+// =====================================
+// `);
+// });
+
+/**
+ * Start Server
+ */
+/**
+ * Start Server
+ */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`
+// Start server locally
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`
 🏭 Sri Lakshmi Rig Spares API Server
 =====================================
 🚀 Server running on port ${PORT}
 📍 Environment: ${process.env.NODE_ENV || 'development'}
 🔗 API URL: http://localhost:${PORT}/api
 =====================================
-`);
-});
+        `);
+    });
+}
+
+// Export app for Vercel
+module.exports = app;
